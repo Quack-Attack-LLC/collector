@@ -1,0 +1,50 @@
+version: '3'
+services:
+
+  #PHP Service
+  app:
+    image: quackattack/collector:latest
+    container_name: app
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    env_file:
+      - .env
+    working_dir: /var/www
+    networks:
+      - app-network
+
+  #MySQL Service
+  db:
+    image: postgres:latest
+    container_name: db
+    restart: unless-stopped
+    tty: true
+    environment:
+      POSTGRES_USER: ducknet
+      POSTGRES_PASSWORD: z5JGGUBQhJcfJG6Mzvsp
+    networks:
+      - app-network
+
+  #Redis Service
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    tty: true
+    networks:
+      - app-network
+
+  watchtower:
+    image: v2tec/watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: app
+
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
